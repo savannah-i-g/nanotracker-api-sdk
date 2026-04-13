@@ -204,6 +204,16 @@ async function handleHttp(req, res) {
     res.writeHead(403); return res.end();
   }
 
+  // CORS — the production nanoTracker page (https://federatedindustrial.com)
+  // makes cross-origin fetches to http://127.0.0.1. We allow any origin
+  // because every endpoint that mutates state still requires the bearer
+  // token; the relay is loopback-bound so there's no LAN exposure.
+  res.setHeader("Access-Control-Allow-Origin",  "*");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Max-Age",       "600");
+  if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
+
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   if (url.pathname === "/v1/health") {
     res.writeHead(200, { "content-type": "application/json" });
