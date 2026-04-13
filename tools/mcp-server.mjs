@@ -99,6 +99,11 @@ const TOOLS = [
       "Apply a batch of mutations atomically (validate-all, then apply-or-reject-all). " +
       "Every batch produces ONE undo entry. opts.undoDescription is REQUIRED unless dryRun. " +
       "Use opts.dryRun:true to preview without mutating. " +
+      "Common ops: setCell (place a note), clearCell, setNoteOff (voice release — prefer over setCell with note:97), " +
+      "setRange, insertRow/deleteRow, resizePattern, createPattern/deletePattern/renamePattern, " +
+      "setOrderList/insertOrderAt/removeOrderAt, setBpm/setSpeed/setChannels, " +
+      "setSampleStretchRatio, conformSampleToRows (snap sample duration to N rows at project bpm), " +
+      "addSeqNote/removeSeqNote/updateSeqNote, and more. " +
       "Run nanotracker_read with op=getSchema for the full command list and field shapes.",
     inputSchema: {
       type: "object",
@@ -126,8 +131,11 @@ const TOOLS = [
   {
     name: "nanotracker_assets_list",
     description:
-      "List audio files in <project>/samples. Project-only — returns " +
-      "{ ok:false, errors:[{code:'noProject'}] } if no project is open. " +
+      "List audio files in <project>/samples/ recursively (max depth 8). " +
+      "Each entry has { name, leafName, directory, size?, lastModified? }: " +
+      "name is the full relative path (e.g. 'Amens/Blasta 170 BPM.wav') — pass it verbatim to nanotracker_assets_load. " +
+      "leafName is just the filename; directory is the parent folder (empty at top level). " +
+      "Project-only — returns { ok:false, errors:[{code:'noProject'}] } if no project is open. " +
       "Tell the user to open a project via PROJECT > EXPLORER if you see noProject.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
     handler: async () => asResult(await relayCall("/v1/assets", { method: "list" })),
@@ -136,6 +144,7 @@ const TOOLS = [
     name: "nanotracker_assets_load",
     description:
       "Load <project>/samples/<fileName> into instrument slot N (1..31). " +
+      "fileName may include forward-slash path segments for files in subfolders — pass the full 'name' returned by nanotracker_assets_list. " +
       "Decodes the file and registers it; the user can then trigger it from pattern cells. " +
       "Combine with nanotracker_execute setSampleStretchRatio or conformSampleToRows to fit it to a bar.",
     inputSchema: {

@@ -101,6 +101,8 @@ Each command's shape is documented in
 { "op": "setCell",  "patternId": 0, "row": 0, "channel": 0,
   "cell": { "note": 49, "instrument": 1, "volume": 64 } }
 
+{ "op": "setNoteOff", "patternId": 0, "row": 8, "channel": 0 }
+
 { "op": "setRange", "patternId": 0, "rowStart": 0,
   "channels": [0, 1],
   "cells": [
@@ -113,6 +115,17 @@ Each command's shape is documented in
 { "op": "setBpm",        "value": 140 }
 ```
 
+### Note-offs
+
+A note-off ends the voice currently playing on a channel. Samples
+without envelope shaping cut immediately; envelope-bearing instruments
+enter release. Prefer the dedicated `setNoteOff` op — `setCell` with
+`{ note: 97 }` works but leaves the neighbouring instrument/volume
+fields in place, which is almost never what you want. `setNoteOff`
+writes the canonical shape
+`{ note: 97, instrument: 0, volume: 0xFF, effect: 0 }` — identical
+to typing `==` in the pattern editor.
+
 Note number encoding: tracker note 1 = C-0, note 49 = C-4 (middle C),
 note 97 = note-off. MIDI 60 = tracker 49. The cheatsheet is at
 [`docs/reference/note-numbers.md`](docs/reference/note-numbers.md).
@@ -122,14 +135,31 @@ note 97 = note-off. MIDI 60 = tracker 49. The cheatsheet is at
 Project-only flow:
 
 ```
-nanotracker_assets_list                              → file list
-nanotracker_assets_load   { slot, fileName }         → loaded
+nanotracker_assets_list                              → recursive file list
+nanotracker_assets_load   { slot, fileName }         → loaded (fileName can contain "/")
 nanotracker_execute       conformSampleToRows N      → snap to N rows
 ```
 
 `conformSampleToRows` computes the `stretchRatio` such that the
 sample plays for exactly N rows at the project's current bpm/speed.
 Use this for drum loops that should fit one bar, two bars, etc.
+
+### Subdirectories
+
+`assets.list` walks `<project>/samples/` recursively (max depth 8)
+and returns entries with full relative paths. Each entry has
+`{ name, leafName, directory, size?, lastModified? }`:
+
+- `name` is the path, forward-slash delimited — pass it verbatim to
+  `assets.load`.
+- `leafName` is just the filename.
+- `directory` is the parent folder (empty string at top level).
+
+So a library with `samples/Amens/Blasta 170 BPM.wav` is reachable via:
+
+```jsonc
+{ "method": "load", "args": { "slot": 1, "fileName": "Amens/Blasta 170 BPM.wav" } }
+```
 
 ## Subscribing
 

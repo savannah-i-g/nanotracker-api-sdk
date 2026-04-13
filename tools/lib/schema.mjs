@@ -6,7 +6,7 @@
  * Re-mirror when the live API surface changes; see CHANGELOG.md.
  */
 
-export const LOCAL_API_VERSION = "1.0";
+export const LOCAL_API_VERSION = "1.1";
 
 export const LOCAL_API_LIMITS = {
   maxCommandsPerBatch:   10000,
@@ -23,8 +23,9 @@ export const LOCAL_API_SCHEMA = {
   version: LOCAL_API_VERSION,
   limits: LOCAL_API_LIMITS,
   commands: [
-    { op: "setCell",     summary: "Merge a partial cell onto the cell at (pattern, row, channel). Undefined fields preserve existing values.", fields: [PATTERN_ID, ROW, CHANNEL, { name: "cell", type: "Partial<TrackerCell>", description: "note (1-96 | 97 noteoff), instrument (1-31), volume (0-64 | 0xFF), effect, effectParam, boundIndex" }] },
-    { op: "clearCell",   summary: "Reset the cell at (pattern, row, channel) to an empty cell.", fields: [PATTERN_ID, ROW, CHANNEL] },
+    { op: "setCell",     summary: "Merge a partial cell onto the cell at (pattern, row, channel). Undefined fields preserve existing values. For note-offs prefer setNoteOff — it clears the neighbouring instrument/volume fields.", fields: [PATTERN_ID, ROW, CHANNEL, { name: "cell", type: "Partial<TrackerCell>", description: "note: 1-96 plays C-0..B-7, 97 is note-off (voice release), 0 is empty. instrument: 1-31 (slot). volume: 0-64 explicit, 0xFF (255) = use sample default. effect + effectParam: classic MOD effects. boundIndex: only consulted when instrument === 0." }] },
+    { op: "clearCell",   summary: "Reset the cell at (pattern, row, channel) to an empty cell (note 0, instrument 0, default volume).", fields: [PATTERN_ID, ROW, CHANNEL] },
+    { op: "setNoteOff",  summary: "Place a note-off (voice release) at (pattern, row, channel). Samples without envelopes cut immediately; envelope-bearing instruments enter release. Writes the canonical cell { note: 97, instrument: 0, volume: 0xFF, effect: 0 } — same as typing '==' in the pattern editor.", fields: [PATTERN_ID, ROW, CHANNEL] },
     { op: "setRange",    summary: "Merge a 2D cell grid onto a rectangle of the pattern. cells[rowOffset][channelIdx] applies to row rowStart+rowOffset, channel channels[channelIdx].", fields: [PATTERN_ID, { name: "rowStart", type: "number" }, { name: "channels", type: "number[]" }, { name: "cells", type: "Partial<TrackerCell>[][]" }] },
     { op: "insertRow",   summary: "Insert `count` empty rows at `at`. Pattern grows.", fields: [PATTERN_ID, { name: "at", type: "number" }, { name: "count", type: "number", optional: true }] },
     { op: "deleteRow",   summary: "Delete `count` rows starting at `at`. Pattern shrinks; at least 1 row must remain.", fields: [PATTERN_ID, { name: "at", type: "number" }, { name: "count", type: "number", optional: true }] },

@@ -1,6 +1,6 @@
 ---
 name: api-load-sample
-description: Load a sample from the open project into a tracker instrument slot, then optionally conform it to a specific row count. Project-only — fails with noProject if no project is open. Combine assets.list + assets.load + execute(conformSampleToRows).
+description: Load a sample from the open project into a tracker instrument slot, then optionally conform it to a specific row count. Walks subdirectories. Project-only — fails with noProject if no project is open.
 ---
 
 
@@ -21,18 +21,39 @@ open one via PROJECT > EXPLORER. **Don't retry.**
 ## Three steps
 
 ```sh
-# 1. See what's available
+# 1. See what's available (recursive — includes subfolders)
 nanotracker_assets_list
 
-# 2. Load a file into a slot (1..31)
-nanotracker_assets_load { "slot": 1, "fileName": "kick.wav" }
+# 2. Load a file into a slot (1..31). fileName can contain "/" for subfolders —
+#    pass the full 'name' field from list() verbatim.
+nanotracker_assets_load { "slot": 1, "fileName": "Amens/Blasta 170 BPM.wav" }
+nanotracker_assets_load { "slot": 2, "fileName": "kick.wav" }
 
 # 3. (Optional) Snap a loop to N rows at the project's bpm/speed
 nanotracker_execute {
   "commands": [{ "op": "conformSampleToRows", "sampleId": 1, "rows": 16 }],
-  "opts": { "undoDescription": "conform kick to 1 bar" }
+  "opts": { "undoDescription": "conform amen to 1 bar" }
 }
 ```
+
+## Subdirectories
+
+`assets.list` walks `<project>/samples/` recursively (max depth 8) and
+returns entries with three name-like fields:
+
+```jsonc
+{
+  "name":      "Amens/Blasta 170 BPM.wav",     // full path, forward-slash, pass to load
+  "leafName":  "Blasta 170 BPM.wav",           // just the filename
+  "directory": "Amens",                        // parent folder (empty at top level)
+  "size":      1494512,
+  "lastModified": 1473590967000
+}
+```
+
+For a sample library organised by pack (e.g. `Amens/`, `JW3/`,
+`One-Shots/Drums/`) the list is flat — one entry per file — but the
+`directory` field makes it easy to filter or group in your own code.
 
 `conformSampleToRows` computes the `stretchRatio` so the sample
 plays for exactly `rows` rows at the project's current bpm/speed.

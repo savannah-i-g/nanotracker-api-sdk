@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.1.0 — note-off op + recursive sample subdirectories
+
+### Surface changes
+
+- **`setNoteOff { patternId, row, channel }`** — dedicated op for writing
+  the canonical note-off cell `{ note: 97, instrument: 0, volume: 0xFF,
+  effect: 0 }`. Same shape as pressing `==` in the pattern editor. Prefer
+  this over `setCell { ..., cell: { note: 97 } }` which accidentally
+  preserves neighbouring instrument/volume fields.
+- **`assets.list`** now walks `<project>/samples/` recursively (max
+  depth 8) and returns entries with full relative paths. Each entry now
+  has `{ name, leafName, directory, size?, lastModified? }` where `name`
+  is the full path (e.g. `Amens/Blasta 170 BPM.wav`).
+- **`assets.load`** accepts path-with-slashes `fileName` values — pass
+  the `name` field from `list()` verbatim and the loader walks the
+  subdirectory chain automatically.
+
+### Docs + tooling
+
+- `docs/PROTOCOL.md`, `docs/ASSETS.md`, `docs/AGENTS-OVERVIEW.md`,
+  `CLAUDE.md`, `AGENTS.md` updated.
+- All four skills (mirrored across `.claude/`, `.hermes/`, `.agents/`)
+  updated.
+- `tools/mcp-server.mjs` tool descriptions updated.
+- `tools/lib/schema.mjs` re-mirrored.
+
 ## v1.0.0 — initial public release
 
 Tracks the nanoTracker Local API surface as shipped in

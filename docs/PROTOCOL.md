@@ -77,6 +77,24 @@ Note encoding:
 
 See [`reference/note-numbers.md`](reference/note-numbers.md) for a table.
 
+### Note-offs
+
+A note-off ends the voice currently playing on a channel. Sample voices
+without envelope shaping cut immediately; plugin instruments with
+release curves enter their release phase.
+
+The canonical note-off cell is `{ note: 97, instrument: 0, volume:
+0xFF, effect: 0, effectParam: 0 }` — same shape as typing `==` in the
+pattern editor. Use the dedicated `setNoteOff` op:
+
+```jsonc
+{ "op": "setNoteOff", "patternId": 0, "row": 48, "channel": 0 }
+```
+
+`setCell` with `{ note: 97 }` works too but it merges — the old
+`instrument` and `volume` fields stay on the cell, which is almost
+never what you want. Prefer `setNoteOff`.
+
 ## Commands
 
 ### Pattern cells + rows
@@ -85,6 +103,7 @@ See [`reference/note-numbers.md`](reference/note-numbers.md) for a table.
 |-----------------|-------------------------------------------------------------------------------------------------|
 | `setCell`       | `patternId, row, channel, cell: Partial<TrackerCell>`                                           |
 | `clearCell`     | `patternId, row, channel`                                                                       |
+| `setNoteOff`    | `patternId, row, channel` — writes canonical note-off cell (see below)                           |
 | `setRange`      | `patternId, rowStart, channels: number[], cells: Partial<TrackerCell>[][]` — outer rows, inner = channels.length |
 | `insertRow`     | `patternId, at, count?` (default 1)                                                             |
 | `deleteRow`     | `patternId, at, count?` (default 1; pattern must keep ≥ 1 row)                                  |

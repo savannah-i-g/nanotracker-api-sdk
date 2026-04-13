@@ -27,6 +27,13 @@ the error code, tell the user, do not retry in a loop.
   the whole batch.
 - **Use `dryRun: true`** for destructive batches against patterns with
   existing cells.
+- **Prefer `setNoteOff` over `setCell` with `{ note: 97 }`.** The
+  dedicated op clears the neighbouring instrument/volume fields so the
+  cell reads as a proper note-off; `setCell` merges and leaves them
+  behind.
+- **`assets.list` returns full relative paths.** Samples inside
+  subfolders of `<project>/samples/` are reachable — pass the `name`
+  field verbatim to `assets.load`.
 - **Sample binary upload is out of scope.** Use `assets.load` to bring
   files in from `<project>/samples/` only.
 - **Hard limits**: 10,000 commands/batch, 64 patterns created/batch,

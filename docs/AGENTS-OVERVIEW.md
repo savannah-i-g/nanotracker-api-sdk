@@ -52,15 +52,19 @@ Use `patternId` from `getPatternList`, NOT an order-list index.
 {
   "commands": [
     { "op": "setCell", "patternId": 0, "row": 0, "channel": 0,
-      "cell": { "note": 49, "instrument": 1, "volume": 64 } }
+      "cell": { "note": 49, "instrument": 1, "volume": 64 } },
+    { "op": "setNoteOff", "patternId": 0, "row": 8, "channel": 0 }
   ],
-  "opts": { "undoDescription": "kick on 1" }
+  "opts": { "undoDescription": "kick on 1, release on 9" }
 }
 ```
 
 Rules:
 - `opts.undoDescription` REQUIRED unless `dryRun: true`.
 - All-or-nothing: any invalid command rejects the whole batch.
+- For note-offs prefer `setNoteOff` — it clears the neighbouring
+  instrument/volume fields. `setCell` with `{ note: 97 }` would keep
+  them, which is almost never what you want.
 - Limits: 10k commands, 1 MiB payload, 20 batches/sec.
 
 ## Note encoding
@@ -78,13 +82,16 @@ Formula: `tracker = midi - 11`.
 ## Sample loading
 
 ```
-nanotracker_assets_list                            → see what's available
-nanotracker_assets_load { slot, fileName }         → install
+nanotracker_assets_list                            → recursive walk, returns full paths
+nanotracker_assets_load { slot, fileName }         → install (fileName can contain "/")
 nanotracker_execute conformSampleToRows N          → snap to N rows
 ```
 
-Returns `{ code: "noProject" }` if no project is open. Tell the user
-to open one via PROJECT > EXPLORER. Don't retry.
+`assets.list` returns `{ name, leafName, directory, size?, lastModified? }`
+per entry. `name` is the full path (e.g. `Amens/Blasta 170 BPM.wav`);
+pass it verbatim to `assets.load`. Returns `{ code: "noProject" }` if no
+project is open. Tell the user to open one via PROJECT > EXPLORER. Don't
+retry.
 
 ## Error codes
 

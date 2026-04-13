@@ -1,6 +1,6 @@
 ---
 name: api-author-pattern
-description: Compose a batch of nanoTracker pattern mutations through the Local API. Cells, rows, structural ops, order list, tempo. One batch is one undo entry. Always include opts.undoDescription. Dry-run destructive batches first.
+description: Compose a batch of nanoTracker pattern mutations through the Local API. Cells, rows, structural ops, order list, tempo, note-offs. One batch is one undo entry. Always include opts.undoDescription. Dry-run destructive batches first.
 ---
 
 
@@ -31,12 +31,14 @@ nanotracker_execute {
 ## Common cell ops
 
 ```jsonc
-{ "op": "setCell",   "patternId": 0, "row": 0, "channel": 0,
+{ "op": "setCell",    "patternId": 0, "row": 0,  "channel": 0,
   "cell": { "note": 49, "instrument": 1, "volume": 64 } }
 
-{ "op": "clearCell", "patternId": 0, "row": 0, "channel": 0 }
+{ "op": "setNoteOff", "patternId": 0, "row": 8,  "channel": 0 }
 
-{ "op": "setRange",  "patternId": 0, "rowStart": 0,
+{ "op": "clearCell",  "patternId": 0, "row": 0,  "channel": 0 }
+
+{ "op": "setRange",   "patternId": 0, "rowStart": 0,
   "channels": [0, 1, 2],
   "cells": [
     [ {"note": 49, "instrument": 1, "volume": 64}, {}, {} ],
@@ -55,6 +57,26 @@ project's channel list.
   = note-off, note 0 = empty.
 - `tracker = midi - 11`.
 - `volume: 0xFF` means "use the sample's default" — not 255 dB.
+
+## Note-offs
+
+A note-off ends the currently-playing voice on a channel. In the pattern
+editor this is the `==` cell. Use the dedicated `setNoteOff` op:
+
+```jsonc
+{ "op": "setNoteOff", "patternId": 0, "row": 48, "channel": 0 }
+```
+
+It writes the canonical cell
+`{ note: 97, instrument: 0, volume: 0xFF, effect: 0 }` — the same shape
+you'd place by typing `==`. `setCell` with `{ note: 97 }` works too but
+merges — the old `instrument` and `volume` fields stay on the cell,
+which reads as a note-off that also holds an instrument, which is
+almost never what you want. Prefer `setNoteOff`.
+
+For a sample without envelope shaping, note-off cuts the voice
+immediately. For envelope-bearing instruments (plugin synths,
+AudioWorklets with release) it starts the release phase.
 
 ## Structural ops
 
