@@ -88,7 +88,7 @@ nanotracker_execute conformSampleToRows N          → snap to N rows
 ```
 
 `assets.list` returns `{ name, leafName, directory, size?, lastModified? }`
-per entry. `name` is the full path (e.g. `Amens/Blasta 170 BPM.wav`);
+per entry. `name` is the full path (e.g. `Drums/break.wav`);
 pass it verbatim to `assets.load`. Returns `{ code: "noProject" }` if no
 project is open. Tell the user to open one via PROJECT > EXPLORER. Don't
 retry.

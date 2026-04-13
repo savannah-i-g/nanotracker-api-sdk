@@ -133,7 +133,7 @@ const TOOLS = [
     description:
       "List audio files in <project>/samples/ recursively (max depth 8). " +
       "Each entry has { name, leafName, directory, size?, lastModified? }: " +
-      "name is the full relative path (e.g. 'Amens/Blasta 170 BPM.wav') — pass it verbatim to nanotracker_assets_load. " +
+      "name is the full relative path (e.g. 'Drums/break.wav') — pass it verbatim to nanotracker_assets_load. " +
       "leafName is just the filename; directory is the parent folder (empty at top level). " +
       "Project-only — returns { ok:false, errors:[{code:'noProject'}] } if no project is open. " +
       "Tell the user to open a project via PROJECT > EXPLORER if you see noProject.",

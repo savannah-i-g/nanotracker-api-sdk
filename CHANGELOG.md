@@ -12,7 +12,7 @@
 - **`assets.list`** now walks `<project>/samples/` recursively (max
   depth 8) and returns entries with full relative paths. Each entry now
   has `{ name, leafName, directory, size?, lastModified? }` where `name`
-  is the full path (e.g. `Amens/Blasta 170 BPM.wav`).
+  is the full path (e.g. `Drums/break.wav`).
 - **`assets.load`** accepts path-with-slashes `fileName` values — pass
   the `name` field from `list()` verbatim and the loader walks the
   subdirectory chain automatically.

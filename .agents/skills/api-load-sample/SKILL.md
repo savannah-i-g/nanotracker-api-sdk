@@ -26,7 +26,7 @@ nanotracker_assets_list
 
 # 2. Load a file into a slot (1..31). fileName can contain "/" for subfolders —
 #    pass the full 'name' field from list() verbatim.
-nanotracker_assets_load { "slot": 1, "fileName": "Amens/Blasta 170 BPM.wav" }
+nanotracker_assets_load { "slot": 1, "fileName": "Drums/break.wav" }
 nanotracker_assets_load { "slot": 2, "fileName": "kick.wav" }
 
 # 3. (Optional) Snap a loop to N rows at the project's bpm/speed
@@ -43,16 +43,16 @@ returns entries with three name-like fields:
 
 ```jsonc
 {
-  "name":      "Amens/Blasta 170 BPM.wav",     // full path, forward-slash, pass to load
-  "leafName":  "Blasta 170 BPM.wav",           // just the filename
+  "name":      "Drums/break.wav",              // full path, forward-slash, pass to load
+  "leafName":  "break.wav",                    // just the filename
   "directory": "Amens",                        // parent folder (empty at top level)
   "size":      1494512,
   "lastModified": 1473590967000
 }
 ```
 
-For a sample library organised by pack (e.g. `Amens/`, `JW3/`,
-`One-Shots/Drums/`) the list is flat — one entry per file — but the
+For a library organised by pack (e.g. `Drums/`, `Basses/`,
+`One-Shots/Synths/`) the list is flat — one entry per file — but the
 `directory` field makes it easy to filter or group in your own code.
 
 `conformSampleToRows` computes the `stretchRatio` so the sample

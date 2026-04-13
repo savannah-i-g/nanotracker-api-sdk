@@ -16,11 +16,11 @@ every audio file with its path relative to `samples/`. No args.
 {
   "ok": true,
   "data": [
-    { "name": "kick.wav",                    "leafName": "kick.wav",              "directory": "",                 "size": 26244,  "lastModified": 1731612301000 },
-    { "name": "Amens/Blasta 170 BPM.wav",    "leafName": "Blasta 170 BPM.wav",    "directory": "Amens",            "size": 1494512 },
-    { "name": "Amens/Complete 170 BPM.wav",  "leafName": "Complete 170 BPM.wav",  "directory": "Amens",            "size": 1494380 },
-    { "name": "JW3/808 Standard 1.wav",      "leafName": "808 Standard 1.wav",    "directory": "JW3",              "size": 1017304 },
-    { "name": "One-Shots/Drums/snare.wav",   "leafName": "snare.wav",             "directory": "One-Shots/Drums",  "size": 18420 }
+    { "name": "kick.wav",                   "leafName": "kick.wav",     "directory": "" },
+    { "name": "loop.wav",                   "leafName": "loop.wav",     "directory": "" },
+    { "name": "Drums/snare.wav",            "leafName": "snare.wav",    "directory": "Drums" },
+    { "name": "Drums/hat.wav",              "leafName": "hat.wav",      "directory": "Drums" },
+    { "name": "One-Shots/Bass/sub.wav",     "leafName": "sub.wav",      "directory": "One-Shots/Bass" }
   ]
 }
 ```
@@ -33,7 +33,13 @@ Each entry has three name-like fields:
 - **`directory`** — the parent directory's path (empty at top level).
 
 Paths use forward slashes regardless of host OS. Depth is capped at 8
-levels so pathologically deep trees don't stall the walk.
+levels so pathologically deep trees don't stall the walk. Size and
+last-modified are omitted from the listing payload — stat-ing every
+file makes `list()` O(filecount) round-trips on FSA / OPFS and blows
+past the relay's request timeout on libraries with a few hundred
+samples. If you need the size of a specific file, check it after
+loading — `assets.load` returns `sample.frames` / `sample.sampleRate`
+which together give you natural duration.
 
 ### `assets.load({ slot, fileName })`
 
@@ -76,7 +82,7 @@ sample. Captures one undo entry.
 node tools/cli.mjs assets list
 
 # load from a subfolder — pass the full 'name' you got from list
-node tools/cli.mjs assets load '{"slot":1,"fileName":"Amens/Blasta 170 BPM.wav"}'
+node tools/cli.mjs assets load '{"slot":1,"fileName":"Drums/break.wav"}'
 
 # or a top-level file
 node tools/cli.mjs assets load '{"slot":2,"fileName":"kick.wav"}'
@@ -84,7 +90,7 @@ node tools/cli.mjs assets load '{"slot":2,"fileName":"kick.wav"}'
 # snap a sample to exactly 16 rows at the project's current bpm/speed
 node tools/cli.mjs execute \
   '[{"op":"conformSampleToRows","sampleId":1,"rows":16}]' \
-  '{"undoDescription":"conform amen to 1 bar"}'
+  '{"undoDescription":"conform loop to 1 bar"}'
 ```
 
 After conforming, hitting that sample on row 0 (with

@@ -155,10 +155,10 @@ and returns entries with full relative paths. Each entry has
 - `leafName` is just the filename.
 - `directory` is the parent folder (empty string at top level).
 
-So a library with `samples/Amens/Blasta 170 BPM.wav` is reachable via:
+So a library with `samples/Drums/break.wav` is reachable via:
 
 ```jsonc
-{ "method": "load", "args": { "slot": 1, "fileName": "Amens/Blasta 170 BPM.wav" } }
+{ "method": "load", "args": { "slot": 1, "fileName": "Drums/break.wav" } }
 ```
 
 ## Subscribing
