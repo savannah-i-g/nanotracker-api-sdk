@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "nanotracker": {
+      "command": "node",
+      "args": ["tools/mcp-server.mjs"]
+    }
+  }
+}
