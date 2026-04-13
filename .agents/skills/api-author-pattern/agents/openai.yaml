@@ -1,0 +1,9 @@
+interface:
+  display_name: "Author nanoTracker pattern"
+  brand_color: "#ff7a00"
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "nanotracker": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/nanotracker-api-sdk/tools/mcp-server.mjs"],
+      "env": {
+        "NANOTRACKER_RELAY": "http://127.0.0.1:9311"
+      }
+    }
+  }
+}

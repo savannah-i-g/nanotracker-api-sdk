@@ -1,0 +1,19 @@
+{
+  "name": "nanotracker-api-sdk-tools",
+  "version": "1.0.0",
+  "description": "Relay + CLI + MCP server for nanoTracker Local API",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.20.0",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "scripts": {
+    "relay": "node relay.mjs",
+    "mcp": "node mcp-server.mjs"
+  }
+}
